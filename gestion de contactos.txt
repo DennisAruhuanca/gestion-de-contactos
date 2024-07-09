@@ -1,0 +1,111 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
+#include <map>
+using namespace std;
+
+struct contactoEmail {
+    string nombreCompleto;
+    char sexo;
+    int edad;
+    string telefono;
+    string email;
+    string nacionalidad;
+};
+
+int main() {
+    vector<contactoEmail> contactos;
+    bool salir = false;
+
+    while (!salir) {
+        int opcion;
+        cout << "Menú de Gestión de Contactos:" << endl;
+        cout << "1. Agregar un contacto" << endl;
+        cout << "2. Eliminar un contacto" << endl;
+        cout << "3. Mostrar listado general de contactos" << endl;
+        cout << "4. Mostrar listado de contactos por servidor de correo" << endl;
+        cout << "5. Salir" << endl;
+        cout << "Ingrese una opción: ";
+        cin >> opcion;
+
+        switch (opcion) {
+            case 1: {
+                contactoEmail nuevoContacto;
+                cout << "Ingrese el nombre completo: ";
+                cin.ignore();
+                getline(cin, nuevoContacto.nombreCompleto);
+                cout << "Ingrese el sexo (M/F): ";
+                cin >> nuevoContacto.sexo;
+                cout << "Ingrese la edad: ";
+                cin >> nuevoContacto.edad;
+                cout << "Ingrese el teléfono: ";
+                cin >> nuevoContacto.telefono;
+                cout << "Ingrese el email: ";
+                cin >> nuevoContacto.email;
+                cout << "Ingrese la nacionalidad: ";
+                cin >> nuevoContacto.nacionalidad;
+                contactos.push_back(nuevoContacto);
+                cout << "Contacto agregado exitosamente." << endl;
+                break;
+            }
+            case 2: {
+                string emailAEliminar;
+                cout << "Ingrese el email del contacto a eliminar: ";
+                cin >> emailAEliminar;
+                auto it = find_if(contactos.begin(), contactos.end(), [&](const contactoEmail& c) {
+                    return c.email == emailAEliminar;
+                });
+                if (it != contactos.end()) {
+                    contactos.erase(it);
+                    cout << "Contacto eliminado exitosamente." << endl;
+                } else {
+                    cout << "No se encontró el contacto con el email ingresado." << endl;
+                }
+                break;
+            }
+            case 3: {
+                if (contactos.empty()) {
+                    cout << "No hay contactos registrados." << endl;
+                } else {
+                    cout << "Listado general de contactos:" << endl;
+                    for (const auto& contacto : contactos) {
+                        cout << "Nombre: " << contacto.nombreCompleto << ", Sexo: " << contacto.sexo << ", Edad: " << contacto.edad << ", Teléfono: " << contacto.telefono << ", Email: " << contacto.email << ", Nacionalidad: " << contacto.nacionalidad << endl;
+                    }
+                }
+                break;
+            }
+            case 4: {
+                if (contactos.empty()) {
+                    cout << "No hay contactos registrados." << endl;
+                } else {
+                    map<string, vector<contactoEmail>> contactosPorServidor;
+                    for (const auto& contacto : contactos) {
+                        string servidor = contacto.email.substr(contacto.email.find("@") + 1);
+                        contactosPorServidor[servidor].push_back(contacto);
+                    }
+                    cout << "Listado de contactos por servidor de correo:" << endl;
+                    for (const auto& [servidor, contactosDelServidor] : contactosPorServidor) {
+                        cout << "Servidor: " << servidor << endl;
+                        for (const auto& contacto : contactosDelServidor) {
+                            cout << "Nombre: " << contacto.nombreCompleto << ", Email: " << contacto.email << endl;
+                        }
+                        cout << endl;
+                    }
+                }
+                break;
+            }
+            case 5: {
+                salir = true;
+                cout << "Saliendo del programa..." << endl;
+                break;
+            }
+            default: {
+                cout << "Opción inválida. Intente de nuevo." << endl;
+                break;
+            }
+        }
+    }
+
+    return 0;
+}
